@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generador de QR</title>
+    <style>
+    body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #fff9cb;
+        font-family: Arial, sans-serif;
+        position: relative;
+    }
+
+    #countdown {
+        font-size: 2em;
+        margin-bottom: 1em;
+    }
+
+    button {
+        margin-bottom: 2em;
+    }
+
+    #image-selector img {
+        width: 104px;
+        height: 83px;
+        margin: 10px;
+        cursor: pointer;
+    }
+
+    #image-selector img.selected {
+        border: 2px solid rgb(77, 255, 225);
+    }
+
+    #contador-container {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+    }
+
+    button#generate {
+        font-size: 1.5em;
+        padding: 10px 20px;
+    }
+     #qrcode {
+        padding: 15px;
+        border-radius: 15px;
+        display: inline-block;
+        }
+
+    #cost {
+        font-family: "Playwrite Nigeria Modern", monospace;
+        font-size: 20px
+    }
+
+    #contador{
+        font-family: "Playwrite España", monospace;
+        font-size: 25px;
+    }
+
+    #attraction-type{
+        font-family: "Playwrite Nigeria Modern", monospace;
+        font-size: 20px;
+    }
+
+    #recompensa-container {
+        margin-top: 50px; /* Ajusta este valor según tus necesidades */
+        
+    }
+    #recompensa-container button {
+        display: block;
+        padding: 8px 16px;
+        font-family: "Playwrite Nigeria Modern", monospace;
+        font-size: 16px;
+    }
+
+    #recompensa-container{
+        position:absolute;
+        bottom: 0;
+        left: 0.1;
+    }
+
+    #texto{
+        position:absolute;
+        top: 0;
+        left: 0;
+        font-family: "Playwrite Nigeria Modern", monospace;
+
+    }
+    </style>
+
+</head>
+<body>
+
+    <script>
+        var recompensa = 5000;
+        var recompensaRecogida = localStorage.getItem('recompensaRecogida') === 'true';
+    
+        function recogerRecompensa() {
+            if (!recompensaRecogida) {
+                contador += recompensa;
+                localStorage.setItem('contador', contador);
+                document.getElementById("contador").innerText = contador;
+                recompensaRecogida = true;
+                localStorage.setItem('recompensaRecogida', true);
+            } else {
+                alert("La recompensa ya ha sido recogida.");
+            }
+        }
+    </script>
+    
+    <div id="recompensa-container">
+        <button onclick="recogerRecompensa()">Recoger 5000</button>
+    </div>
+    
+
+    <div id="countdown"></div>
+    <button id="generate">Generar QR</button>
+    <div id="image-selector">
+        
+        <img src="El raton vacilón.png" data-value="el raton vacilon">
+        <img src="The most experience.png" data-value="the most experience">
+        <img src="El barco pirata.png" data-value="barco pirata">
+        <img src="El colgante.png" data-value="colgante">
+        <img src="El colgante 2.png" data-value="colgante 2">
+        <img src="Volador.png" data-value="volador">
+        <img src="De lado a lado.png" data-value="de lado a lado">
+        <img src="la paella.png" data-value="la paella">
+        <img src="De todo.png" data-value="de todo">
+        <img src="Los colgantes.png" data-value="colgantes">
+        <img src="El deslizado.png" data-value="deslizado">
+        <img src="Vértigo.png" data-value="vertigo">
+        <img src="Dragón Chino (4).png" data-value="dragon chino">
+        <img src="Volando voy.png" data-value="volando voy">
+        <img src="Volando voy 2.0.png" data-value="volando voy 2.0">
+        <img src="Shambalino.png" data-value="shambalino">
+        <img src="Balanceo.png" data-value="balanceo">
+        <img src="Mareo.png" data-value="mareo">
+        <img src="La caida guay.png" data-value="caida guay">
+        <img src="La muerte.png" data-value="la muerte">
+        <img src="La muerte 2.0.png" data-value="la muerte 2.0">
+        <img src="Circulo.png" data-value="Circulo">
+        <img src="Los laditos.png" data-value="los laditos">
+        <img src="Los volandos.png" data-value="los volandos">
+        
+    </div>
+    <div id="qrcode"></div>
+
+    <!-- Nuevo elemento para mostrar el costo -->
+    <div id="cost"></div>
+
+    <!-- Nuevo elemento para mostrar el tipo de atracción -->
+    <div id="attraction-type"></div>
+
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <script>
+    var selectedAttraction = null;
+
+    var attractionColors = {
+        "Circulo": {background: "#FFD6A6", qr: "#EB72DB"},
+        "los laditos": {background: "#AFF6B9", qr: "#33ECF8"},
+        "el raton vacilon": {background: "#A6A6A6", qr: "#4C4C4C"},
+        "the most experience": {background: "#FDA3A3", qr: "#FF3131"},
+        "barco pirata": {background: "#AD4409", qr: "#F48C1F"},
+        "colgante": {background: "#F6FF8B", qr: "#10F83C"},
+        "colgante 2": {background: "#FFD699", qr: "#FF9100"},
+        "volador": {background: "#C9FFFF", qr: "#37DDD3"},
+        "de lado a lado": {background: "#FFE491", qr: "#00FF7D"},
+        "la paella": {background: "#FFD699", qr: "#FF9100"},
+        "de todo": {background: "#57FFF5", qr: "#6B6DD1"},
+        "colgantes": {background: "#FFD600", qr: "#FD2E2E"},
+        "deslizado": {background: "#33ECF8", qr: "#67A4FF"},
+        "vertigo": {background: "#FBE46C", qr: "#8DF84A"},
+        "dragon chino": {background: "#FF3131", qr: "#FF3131"},
+        "volando voy": {background: "#5DE0E6", qr: "#004AAD"},
+        "volando voy 2.0": {background: "#CDFFD8", qr: "#94B9FF"},
+        "shambalino": {background: "#5CE1E6", qr: "#5CE1E6"},
+        "balanceo": {background: "#FFF7AD", qr: "#FFA9F9"},
+        "mareo": {background: "#0097B2", qr: "#7ED957"},
+        "caida guay": {background: "#5CE1E6", qr: "#8C52FF"},
+        "la muerte": {background: "#FF914D", qr: "#FF3131"},
+        "la muerte 2.0": {background: "#FF5757", qr: "#8C52FF"},
+        "los volandos": {background: "#87F4FF", qr: "#736CFB"},
+        }; 
+    var imageCosts = {
+        "Circulo": 100,
+        "los laditos": 100,
+        "el raton vacilon": 300,
+        "the most experience": 250,
+        "barco pirata": 150,
+        "colgante": 200,
+        "colgante 2": 200,
+        "volador": 150,
+        "de lado a lado": 150,
+        "la paella": 250,
+        "de todo": 600,
+        "colgantes": 400,
+        "deslizado": 150,
+        "vertigo": 250,
+        "dragon chino": 300,
+        "volando voy": 150,
+        "volando voy 2.0": 200,
+        "shambalino": 150,
+        "balanceo": 100,
+        "mareo": 200,
+        "caida guay": 150,
+        "la muerte": 200,
+        "la muerte 2.0": 250,
+        "los volandos": 350,
+        
+    };
+
+    var attractionTypes = {
+        "Circulo": "Tipo de atracción: Columpio",
+        "los laditos": "Tipo de atracción: Columpio",
+        "el raton vacilon": "Tipo de atraccion: Cesta",
+        "the most experience": "Tipo de atracción: Cesta",
+        "barco pirata": "Tipo de atracción: Cesta",
+        "colgante": "Tipo de atracción: Cesta",
+        "colgante 2": "Tipo de atracción: Cesta",
+        "volador": "Tipo de atracción: Cesta",
+        "de lado a lado": "Tipo de atracción: Cesta",
+        "la paella": "Tipo de atracción: Cesta",
+        "de todo": "Tipo de atracción: Cesta",
+        "colgantes": "Tipo de atracción: Cesta",
+        "deslizado": "Tipo de atracción: Cesta",
+        "vertigo": "Tipo de atracción: Cesta",
+        "dragon chino": "Tipo de atracción: Columpio",
+        "volando voy": "Tipo de atracción: Columpio",
+        "volando voy 2.0": "Tipo de atracción: Columpio",
+        "shambalino": "Tipo de atracción: Columpio",
+        "balanceo": "Tipo de atracción: Columpio",
+        "mareo": "Tipo de atracción: Columpio",
+        "caida guay": "Tipo de atracción: Columpio",
+        "la muerte": "Tipo de atracción: Columpio",
+        "la muerte 2.0": "Tipo de atracción: Columpio",
+        "los volandos": "Tipo de atracción: Columpio",
+    };
+
+    var images = document.querySelectorAll('#image-selector img');
+    images.forEach(function(img) {
+        img.addEventListener('click', function() {
+            images.forEach(function(img) {
+                img.classList.remove('selected');
+            });
+            img.classList.add('selected');
+            selectedAttraction = img.dataset.value;
+
+            var cost = imageCosts[selectedAttraction];
+            var costElement = document.getElementById('cost');
+            if (cost) {
+                costElement.innerText = "El costo de la atracción es: " + cost + " euros.";
+            } else {
+                costElement.innerText = "Lo siento, no se encontró el costo de la imagen seleccionada.";
+            }
+
+            var type = attractionTypes[selectedAttraction];
+            var typeElement = document.getElementById('attraction-type');
+            if (type) {
+                typeElement.innerText = type;
+            } else {
+                typeElement.innerText = "Lo siento, no se encontró el tipo de la atracción seleccionada.";
+            }
+        });
+    });
+
+    document.getElementById('generate').addEventListener('click', function() {
+        if (selectedAttraction === null) {
+            alert('Por favor, selecciona una atraccion.');
+            return;
+        }
+
+        var countdownElement = document.getElementById('countdown');
+        var countdownValue = 60;
+        countdownElement.innerText = countdownValue;
+
+        var countdownInterval = setInterval(function() {
+            countdownValue--;
+            countdownElement.innerText = countdownValue;
+            if (countdownValue <= 0) {
+                clearInterval(countdownInterval);
+                generateQRCode();
+            }
+        }, 1000);
+    });
+
+    function generateQRCode() {
+        
+    
+        var date = new Date();
+        var countdown = 15 * 60;
+    
+
+        var data = {
+            atraccion: selectedAttraction,
+            date: date.toString(),
+            countdown: countdown
+        };
+
+        var qrcodeElement = document.getElementById('qrcode');
+        qrcodeElement.innerHTML = '';
+        var qrcode = new QRCode(qrcodeElement, {
+            text: JSON.stringify(data),
+            width: 128,
+            height: 128
+        });
+
+        var qrcodeElement = document.getElementById('qrcode');
+        qrcodeElement.innerHTML = '';
+        qrcodeElement.style.backgroundColor = attractionColors[selectedAttraction].background;
+        var qrcode = new QRCode(qrcodeElement, {
+            text: JSON.stringify(data),
+            width: 128,
+            height: 128,
+            colorDark : attractionColors[selectedAttraction].qr,
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+
+        var cost = imageCosts[selectedAttraction];
+        if (cost) {
+            contador -= cost;
+            localStorage.setItem('contador', contador);
+            document.getElementById("contador").innerText = contador;
+        }    
+
+    }
+
+    
+    </script>
+
+    <div id="contador-container">
+        <h1>Contador de Dinero</h1>
+        <p id="contador">0</p>
+        <button onclick="cambiarContador()">Cambiar Contador</button>
+    </div>
+
+    <div id="texto">
+     <h1>Seleccionador_básico</h1>
+
+    </div>
+
+    <script>
+        var password = "Cholely1825";
+        var contador = localStorage.getItem('contador') ? parseInt(localStorage.getItem('contador')) : 0;
+        document.getElementById("contador").innerText = contador;
+
+        function cambiarContador() {
+            var userPassword = prompt("Por favor, introduce la contraseña:");
+            if (userPassword === password) {
+                var nuevoContador = prompt("Introduce el nuevo valor del contador:");
+                contador = parseInt(nuevoContador);
+                localStorage.setItem('contador', contador);
+                document.getElementById("contador").innerText = contador;
+            } else {
+                alert("Contraseña incorrecta.");
+            }
+        }
+    </script>
+
+    <script>
+        var attractionCosts = {
+            "Circulo": 100,
+            "los laditos": 100,
+            "el raton vacilón": 300,
+            "the most experience": 250,
+            "barco pirata": 150
+        };
+    </script>
+</body>
+</html>
